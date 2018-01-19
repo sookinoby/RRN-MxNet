@@ -30,11 +30,11 @@ Figure 1. A human mind maintains state <br /> ![Alt text](images/KFC_Thinking01.
 
 This is because our brains can remember the context of a conversation from memory, and retrieve those contexts whenever it needs. Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 2 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured. <br />
 
-Figure 2. Feed-forward neural network <br /> ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
-
+Figure 2. CNN spatial context vs RNN spatial context <br /> ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
+	
  It cannot understand learn context since there is no “memory” state. So it cannot model sequential/temporally data (data with definitive ordering, like the structure of a language). An abstract view of feed-forward neural network is shown in Figure 3 <br /> 
 
-Figure 3. Feed-forward neural network <br/ >![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
+Figure 3. Feed-forward neural network <br /> ![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
 
 An RNN is more versatile. Its cells accept weighted input and produce both weighted output (WO) and weighted hidden state (WH). The hidden state acts as the memory that stores context. If an RNN represents a person talking on the phone, the weighted output is the words spoken, and the weighted hidden state is the context in which the person utters the word
 
@@ -66,7 +66,7 @@ In this section, we will explain the similarity between a feed forward neural ne
 
 Suppose we have to predict the 4th character in a stream of text, given the first three characters. To do that, we can design a simple Feed Forward Neural Network as in Figure. 4
 
-Figure 4. <br /> ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
+Figure 4. Unrolled RNN <br /> ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
 
 This is basically a Feed Forward Network where the weights WI (green arrows) and WH (yellow arrows) are shared between some of the layers. This is an unrolled version of [Vanilla RNN](https://towardsdatascience.com/lecture-evolution-from-vanilla-rnn-to-gru-lstms-58688f1da83a), generally referred to as a many-to-one RNN because multiple inputs (3 characters, in this case) are used to predict one character. The RNN can be designed using MxNet as follows:
 
@@ -587,3 +587,5 @@ You can also train a model on your chat history to predict the next character yo
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
 *Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
+
+
