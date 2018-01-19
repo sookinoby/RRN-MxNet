@@ -241,7 +241,8 @@ idx = [char_indices[c] for c in text]
 
 Our goal is to convert the data set to a series of inputs and outputs. Each sequence of three characters from the input stream will be stored as the three input characters to our model, with the next character being the output we are trying to train our model to predict. For instance, we would translate the string "I_love_mxnet" into the inputs and outputs shown in Table 1.
 
-Table 1. How predictions are based on an input stream for "I_love_mxnet" ! <br />[Alt text](images/unroll_input.png?raw=true "unrolled input") <br />
+Table 1. How predictions are based on an input stream for "I_love_mxnet" ! <br /> 
+[Alt text](images/unroll_input.png?raw=true "unrolled input") <br />
 
 The code to do the conversion follows.
 
