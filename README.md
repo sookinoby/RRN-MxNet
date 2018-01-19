@@ -307,7 +307,7 @@ def get_batch(source,label_data, i,batch_size=32):
 In the previous section, we prepared the dataset to predict the 4th character in input, given the previous 3 characters. In this section, we will generalize the algorithm to predict the nth character given a sequence with arbitrary length of n-1. This is very similar to preparing the dataset for unrolled RNN, except for the shape of the input. The dataset should be ordered in the shape (number of example X batch_size). Now, let us divide the sample dataset into batches as shown below: in Table 2.
 
 Table 2. Batched input <br />
-![Alt text] images/batch3.png?raw=true "batch reshape") <br />
+![Alt text] (images/batch3.png?raw=true "batch reshape") <br />
 
 We have converted the input sequence to a batch size of 3 and a sequence length of 4. By transforming it this way, we lose the temporal relationship between many adjacent characters, such as  'O' and 'V' or 'M' and 'X'. For example, ‘V' follows ‘O'  in the input sequence but ‘V' and ‘O' belong to different batches; The only reason we batch the input sequence is to train our model faster. The following Python function does the batching of input:
 
@@ -327,7 +327,7 @@ def rnn_batch(data, batch_size):
 
 ```
 
-Table 3 shows another example with batch size 2<br />  ![Alt text](images/batch4.png?raw=true "batch reshape") <br /> and sequence length of 6.  It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
+Table 3 shows another example with batch size 2 <br /> and sequence length of 6.  ![Alt text](images/batch4.png?raw=true "batch reshape") <br /> It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
 
 ```python
 
