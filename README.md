@@ -585,4 +585,4 @@ You can also train a model on your chat history to predict the next character yo
 
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
-*Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document]((https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
+*Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
