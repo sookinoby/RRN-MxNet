@@ -138,11 +138,11 @@ class UnRolledRNN_Model(Block):
 
 Basically, this neural network has embedding layers (emb) followed by 3 dense layers:
 
-Dense1 (with weights WI), which accepts the input
+1.	Dense1 (with weights WI), which accepts the input
 
-Dense 2 (with weights WH) (an intermediate layer)
+2.	Dense 2 (with weights WH) (an intermediate layer)
 
-Dense3 (with weights WO), which produces the output. We also do some MXNet array addition to combine inputs.
+3.	Dense3 (with weights WO), which produces the output. We also do some MXNet array addition to combine inputs.
 
 You can check this [blog post](https://www.oreilly.com/ideas/sentiment-analysis-with-apache-mxnet) to learn about embedding layer) and its functionality.  The Dense layers 1, 2, and 3 learn a set of weights that can predict the 4th character given the first 3 characters.
 
@@ -587,5 +587,3 @@ You can also train a model on your chat history to predict the next character yo
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
 *Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
-
-
