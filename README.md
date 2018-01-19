@@ -26,10 +26,10 @@ To understand this tutorial, you need a basic understanding of Recurrent Neural 
 
 Although Feed Forward Neural Networks, including Convolution Neural Networks, have shown great accuracy in classifying sentences and text, they cannot store long-term dependencies in memory (hidden state). For example, whenever an average American thinks about KFC chicken, her brain immediately thinks of it as "hot" and "crispy" (Figure 1).
 
-Figure 1. A human mind maintains state ![Alt text](images/KFC_Thinking01.jpg?raw=true "Sequence to Sequence model")
+Figure 1. A human mind maintains state ![Alt text](images/KFC_Thinking01.jpg?raw=true "Understanding context")
 
 This is because our brains can remember the context of a conversation from memory, and retrieve those contexts whenever it needs. Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 2 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured.
-Figure 2. Feed-forward neural network ![Alt text](images/cnnvsrnn?raw=true "RNN vs CNN")
+Figure 2. Feed-forward neural network ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
 
  It cannot understand learn context since there is no “memory” state. So it cannot model sequential/temporally data (data with definitive ordering, like the structure of a language). An abstract view of feed-forward neural network is shown in Figure 3 <br /> 
 
