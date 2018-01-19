@@ -327,7 +327,7 @@ def rnn_batch(data, batch_size):
 
 ```
 
-Table 3 shows another example with batch size 2 <br /> and sequence length of 6.  ![Alt text](images/batch4.png?raw=true "batch reshape") <br /> It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
+Table 3. shows another example with batch size 2 and sequence length of 6. <br />   ![Alt text](images/batch4.png?raw=true "batch reshape") <br /> It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
 
 ```python
 
@@ -588,3 +588,5 @@ You can also train a model on your chat history to predict the next character yo
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
 *Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
+
+
