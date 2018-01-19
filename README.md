@@ -160,9 +160,9 @@ hidden_state_at_t = (WI x input + WH x previous_hidden_state)
 
 Vanilla RNNs have some limitations. For example, let's say we have a long document containing the sentences "I was born in France during the world war" and "So I can speak French." A Vanilla RNN cannot understand the context of being "born in France" and "I can speak French" if they are far apart in a given document.
 
-In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6)In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
+In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6).In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
 
-Figure 6. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true" Sequence to Sequence model") <br />
+Figure 6. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true "Sequence to Sequence model with loss shown") <br />
 
 
 RNN doesn't provide the capability (at least in practice) to forget the irrelevant context in between the phrases. RNN gives more importance to the most previous hidden state because it cannot give preference to the arbitrary (t-k) hidden state, where t is the current time step and k is the number greater than 0. This is because training an RNN on a long sequence of words can cause the gradient to vanish (when the gradient is small) or to explode (when the gradient is large) during backpropagation. Basically, the [backpropagation algorithm](http://neuralnetworksanddeeplearning.com/chap2.html) multiplies the gradients along the computational graph of the neural network in reverse direction. Hence, when the eigenvalue of the Hidden state matrix is large or small, the gradient becomes unstable. A detailed explanation of the problems with RNN is explained [here](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.421.8930&rep=rep1&type=pdf).
@@ -587,3 +587,5 @@ You can also train a model on your chat history to predict the next character yo
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
 *Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
+
+
