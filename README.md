@@ -148,7 +148,7 @@ You can check this [blog post](https://www.oreilly.com/ideas/sentiment-analysis-
 
 We use [Binary Cross Entropy Loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SigmoidBinaryCrossEntropyLoss) in our model. This model can be folded back and succinctly represented like Figure 5. <br />
 
-Figure 5. Binary Cross Entropy Loss architecture  <br /> ![Alt text](images/RNN.png?raw=true "RNN")  <br />
+Figure 5. RNN simplified representation <br /> ![Alt text](images/RNN.png?raw=true "RNN")  <br />
 
 Figure 5 helps explain the math behind the model, which can be carried out as follows:
 
@@ -160,7 +160,7 @@ hidden_state_at_t = (WI x input + WH x previous_hidden_state)
 
 Vanilla RNNs have some limitations. For example, let's say we have a long document containing the sentences "I was born in France during the world war" and "So I can speak French." A Vanilla RNN cannot understand the context of being "born in France" and "I can speak French" if they are far apart in a given document.
 
-In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6).In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
+In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6). In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
 
 Figure 6. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true "Sequence to Sequence model with loss shown") <br />
 
