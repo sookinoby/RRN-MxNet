@@ -26,14 +26,15 @@ To understand this tutorial, you need a basic understanding of Recurrent Neural 
 
 Although Feed Forward Neural Networks, including Convolution Neural Networks, have shown great accuracy in classifying sentences and text, they cannot store long-term dependencies in memory (hidden state). For example, whenever an average American thinks about KFC chicken, her brain immediately thinks of it as "hot" and "crispy" (Figure 1).
 
-Figure 1. A human mind maintains state ![Alt text](images/KFC_Thinking01.jpg?raw=true "Understanding context")
+Figure 1. A human mind maintains state <br /> ![Alt text](images/KFC_Thinking01.jpg?raw=true "Understanding context")
 
-This is because our brains can remember the context of a conversation from memory, and retrieve those contexts whenever it needs. Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 2 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured.
-Figure 2. Feed-forward neural network ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
+This is because our brains can remember the context of a conversation from memory, and retrieve those contexts whenever it needs. Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 2 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured. <br />
+
+Figure 2. Feed-forward neural network <br /> ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
 
  It cannot understand learn context since there is no “memory” state. So it cannot model sequential/temporally data (data with definitive ordering, like the structure of a language). An abstract view of feed-forward neural network is shown in Figure 3 <br /> 
 
-Figure 3. Feed-forward neural network ![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
+Figure 3. Feed-forward neural network <br/ >![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
 
 An RNN is more versatile. Its cells accept weighted input and produce both weighted output (WO) and weighted hidden state (WH). The hidden state acts as the memory that stores context. If an RNN represents a person talking on the phone, the weighted output is the words spoken, and the weighted hidden state is the context in which the person utters the word
 
@@ -65,7 +66,7 @@ In this section, we will explain the similarity between a feed forward neural ne
 
 Suppose we have to predict the 4th character in a stream of text, given the first three characters. To do that, we can design a simple Feed Forward Neural Network as in Figure. 4
 
-Figure 4. ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
+Figure 4. <br /> ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
 
 This is basically a Feed Forward Network where the weights WI (green arrows) and WH (yellow arrows) are shared between some of the layers. This is an unrolled version of [Vanilla RNN](https://towardsdatascience.com/lecture-evolution-from-vanilla-rnn-to-gru-lstms-58688f1da83a), generally referred to as a many-to-one RNN because multiple inputs (3 characters, in this case) are used to predict one character. The RNN can be designed using MxNet as follows:
 
@@ -147,7 +148,7 @@ You can check this [blog post](https://www.oreilly.com/ideas/sentiment-analysis-
 
 We use [Binary Cross Entropy Loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SigmoidBinaryCrossEntropyLoss) in our model. This model can be folded back and succinctly represented like Figure 5. <br />
 
-Figure 5. Binary Cross Entropy Loss architecture ![Alt text](images/RNN.png?raw=true "RNN")  <br />
+Figure 5. Binary Cross Entropy Loss architecture  <br /> ![Alt text](images/RNN.png?raw=true "RNN")  <br />
 
 Figure 5 helps explain the math behind the model, which can be carried out as follows:
 
@@ -161,7 +162,7 @@ Vanilla RNNs have some limitations. For example, let's say we have a long docume
 
 In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6)In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
 
-Figure 6. Sequence-to-sequence RNN ![Alt text](images/loss.png?raw=true" Sequence to Sequence model") <br />
+Figure 6. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true" Sequence to Sequence model") <br />
 
 
 RNN doesn't provide the capability (at least in practice) to forget the irrelevant context in between the phrases. RNN gives more importance to the most previous hidden state because it cannot give preference to the arbitrary (t-k) hidden state, where t is the current time step and k is the number greater than 0. This is because training an RNN on a long sequence of words can cause the gradient to vanish (when the gradient is small) or to explode (when the gradient is large) during backpropagation. Basically, the [backpropagation algorithm](http://neuralnetworksanddeeplearning.com/chap2.html) multiplies the gradients along the computational graph of the neural network in reverse direction. Hence, when the eigenvalue of the Hidden state matrix is large or small, the gradient becomes unstable. A detailed explanation of the problems with RNN is explained [here](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.421.8930&rep=rep1&type=pdf).
@@ -240,7 +241,7 @@ idx = [char_indices[c] for c in text]
 
 Our goal is to convert the data set to a series of inputs and outputs. Each sequence of three characters from the input stream will be stored as the three input characters to our model, with the next character being the output we are trying to train our model to predict. For instance, we would translate the string "I_love_mxnet" into the inputs and outputs shown in Table 1.
 
-Table 1. How predictions are based on an input stream for "I_love_mxnet" ![Alt text](images/unroll_input.png?raw=true "unrolled input") <br />
+Table 1. How predictions are based on an input stream for "I_love_mxnet" ! <br />[Alt text](images/unroll_input.png?raw=true "unrolled input") <br />
 
 The code to do the conversion follows.
 
@@ -305,7 +306,7 @@ def get_batch(source,label_data, i,batch_size=32):
 In the previous section, we prepared the dataset to predict the 4th character in input, given the previous 3 characters. In this section, we will generalize the algorithm to predict the nth character given a sequence with arbitrary length of n-1. This is very similar to preparing the dataset for unrolled RNN, except for the shape of the input. The dataset should be ordered in the shape (number of example X batch_size). Now, let us divide the sample dataset into batches as shown below: in Table 2.
 
 Table 2. Batched input
-![Alt text](images/batch3.png?raw=true "batch reshape") <br />
+![Alt text]<br />(images/batch3.png?raw=true "batch reshape") <br />
 
 We have converted the input sequence to a batch size of 3 and a sequence length of 4. By transforming it this way, we lose the temporal relationship between many adjacent characters, such as  'O' and 'V' or 'M' and 'X'. For example, ‘V' follows ‘O'  in the input sequence but ‘V' and ‘O' belong to different batches; The only reason we batch the input sequence is to train our model faster. The following Python function does the batching of input:
 
@@ -325,7 +326,7 @@ def rnn_batch(data, batch_size):
 
 ```
 
-Table 3 shows another example with batch size 2 ![Alt text](images/batch4.png?raw=true "batch reshape") <br /> and sequence length of 6.  It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
+Table 3 shows another example with batch size 2 ![Alt text]<br />(images/batch4.png?raw=true "batch reshape") <br /> and sequence length of 6.  It is very easy to generate the an input sequence of arbitrary length from a given batch. For example, if we want to generate a sequence of length 3 from a batch size of 2, we can do so easily using the following code.
 
 ```python
 
