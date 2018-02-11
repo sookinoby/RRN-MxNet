@@ -2,7 +2,7 @@
 
 In our previous notebooks, we used a deep learning technique called Convolution Neural Network (CNN) to classify [text](https://www.oreilly.com/ideas/sentiment-analysis-with-apache-mxnet) and [images](https://www.oreilly.com/ideas/classifying-traffic-signs-with-mxnet-an-introduction-to-computer-vision-with-neural-networks). Even though CNN is a powerful technique, it cannot learn temporal features from an input sequence such as audio and text. Moreover, CNN is designed to learn spatial features with fixed length convolution kernel. These types of neural networks are called Feed Forward Neural Networks. On the other hand, a Recurrent Neural Network (RNN) is a type of neural network that can learn temporal features and has a wider range of applications than Feed Forward Neural Network.
 
-In this notebook, we will develop a Recurrent Neural Network that predicts the probability of a word or character given the previous word or character. Almost all of us have a predictive keyboard on our smartphone, which suggests upcoming words for super-fast typing. A Recurrent Neural Network allows us to build the most advanced predictive system similar to [SwiftKey](https://blog.swiftkey.com/swiftkey-debuts-worlds-first-smartphone-keyboard-powered-by-neural-networks/).
+In this notebook, we will develop a Recurrent Neural Network that predicts the probability of a word or character given the previous word or character. Almost all of us have a predictive keyboard on our smartphone, which suggests upcoming words for super-fast typing. A Recurrent Neural Network allows us to build the most advanced predictive system similar to SwiftKey.
 
 We will first cover the limitations of a Feed Forward Neural Networks. Next, we will implement a basic RNN using Feed Forward Neural Network that can provide a good insight into how RNN works. After that, we will design a powerful RNN with LSTM and GRU layers using MxNet’s gluon API. We will use this RNN to generate text.
 
@@ -22,119 +22,79 @@ We will also talk about the following topics:
 
 To understand this tutorial, you need a basic understanding of Recurrent Neural Networks (RNNs), Activation Functions, Gradient Descent, and Back Propagation. You should also know something about Python’s NumPy library.
 
-### Feed forward neural network Versus Recurrent Neural network
+### Feed Forward Neural Network Versus Recurrent Neural network
 
-Although Feed Forward Neural Networks, including Convolution Neural Networks, have shown great accuracy in classifying sentences and text, they cannot store long-term dependencies in memory (hidden state). For example, whenever an average American thinks about KFC chicken, her brain immediately thinks of it as "hot" and "crispy" (Figure 1).
+Although Feed Forward Neural Networks, including Convolution Neural Networks, have shown great accuracy in classifying sentences and text, they cannot store long-term dependencies in memory (hidden state). Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 1 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured. <br />
 
-Figure 1. A human mind maintains state <br /> ![Alt text](images/KFC_Thinking01.jpg?raw=true "Understanding context")
-
-This is because our brains can remember the context of a conversation from memory, and retrieve those contexts whenever it needs. Memory can be viewed as temporal state that can updated over time.  A Feed-Forward Neural Network can't interpret the context since it does not store temporal state (“memory”). A CNN can only learn spatial context from a local group of neighbors(image/sequence) within the size of its convolution kernels. Figure 2 Shows the Convolution neural network spatial context vs RNN temporal  context for a sample dataset. In CNN the relationship between ‘O’ and ‘V’ is lost since they are part of different Convolution’s spatial context. In RRN, the temporal relationship between the characters ‘L’,’O’,’V’,’E’ is captured. <br />
-
-Figure 2. CNN spatial context vs RNN spatial context <br /> ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
+Figure 1. CNN spatial context vs RNN spatial context <br /> ![Alt text](images/cnnvsrnn.png?raw=true "RNN vs CNN")
 	
- It cannot understand learn context since there is no “memory” state. So it cannot model sequential/temporally data (data with definitive ordering, like the structure of a language). An abstract view of feed-forward neural network is shown in Figure 3 <br /> 
+ It cannot understand learn context since there is no “memory” state. So it cannot model sequential/temporally data (data with definitive ordering, like the structure of a language). An abstract view of feed-forward neural network is shown in Figure 2 <br /> 
 
-Figure 3. Feed-forward neural network <br /> ![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
+Figure 2. Feed-forward neural network <br /> ![Alt text](images/ffn_rnn.png?raw=true "Sequence to Sequence model")
 
 An RNN is more versatile. Its cells accept weighted input and produce both weighted output (WO) and weighted hidden state (WH). The hidden state acts as the memory that stores context. If an RNN represents a person talking on the phone, the weighted output is the words spoken, and the weighted hidden state is the context in which the person utters the word
 
-A simple example can help us understand long-term dependencies. HTML markup shown below is dependent on state, because it’s important to nest tags properly, as shown in the following simple HTML.
-
-```python
-
-<html>
-
-<head>
-
-<title>
-
-RNN, Here I come.
-
- </title>
-
- </head> <body>HTML is amazing, but I should not forget the end tag.</body>
-
- </html>
-
- ```
-
-The model should remember long-term dependencies like the need for the start tag <html> and end tag </html>. A CNN does not have provision to remember long-term context like these. On the other hand, an RNN can remember the context using its internal "memory," just as a person might think "Hey, I saw an <html> tag, then a <title> tag, so I need to close the <title> tag before closing the <html> tag."
 
 ### The intuition behind RNNs
 
 In this section, we will explain the similarity between a feed forward neural network and RNN by building an unrolled version of Vanilla RNN using a feed forward neural network. A Vanilla RNN has a simple hidden state matrix (memory) and is easy to understand and implement.
 
-Suppose we have to predict the 4th character in a stream of text, given the first three characters. To do that, we can design a simple Feed Forward Neural Network as in Figure. 4
+Suppose we have to predict the 4th character in a stream of text, given the first three characters. To do that, we can design a simple Feed Forward Neural Network as in Figure. 3
 
-Figure 4. Unrolled RNN <br /> ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
+Figure 3. Unrolled RNN <br /> ![Alt text](images/unRolled_rnn.png?raw=true "Unrolled RNN") <br />
 
 This is basically a Feed Forward Network where the weights WI (green arrows) and WH (yellow arrows) are shared between some of the layers. This is an unrolled version of [Vanilla RNN](https://towardsdatascience.com/lecture-evolution-from-vanilla-rnn-to-gru-lstms-58688f1da83a), generally referred to as a many-to-one RNN because multiple inputs (3 characters, in this case) are used to predict one character. The RNN can be designed using MxNet as follows:
 
 ```python
 
 class UnRolledRNN_Model(Block):
-
-  # This is the initialisation of UnRolled RNN
-
-    def __init__(self,vocab_size, num_embed, num_hidden,**kwargs):
-
+    def __init__(self, vocab_size, num_embed, num_hidden, **kwargs):
         super(UnRolledRNN_Model, self).__init__(**kwargs)
-
         self.num_embed = num_embed
-
         self.vocab_size = vocab_size
 
-        # Use name_scope to give child Blocks appropriate names.
-
-        # It also allows sharing parameters between blocks recursively.
-
+        # use name_scope to give child Blocks appropriate names.
+        # It also allows sharing Parameters between Blocks recursively.
         with self.name_scope():
-
             self.encoder = nn.Embedding(self.vocab_size, self.num_embed)
-
-            self.dense1 = nn.Dense(num_hidden,activation='relu',flatten=True)
-
-            self.dense2 = nn.Dense(num_hidden,activation='relu',flatten=True)
-
-            self.dense3 = nn.Dense(vocab_size,flatten=True)
-
-    # This is the forward pass of neural network
+            self.dense1 = nn.Dense(num_hidden, activation='relu', flatten=True)
+            self.dense2 = nn.Dense(num_hidden, activation='relu', flatten=True)
+            self.dense3 = nn.Dense(vocab_size, flatten=True)
 
     def forward(self, inputs):
-
         emd = self.encoder(inputs)
-
-        #print(emd.shape)
-
-        #since the input is shape(batch_size,input(3 characters))
-
-        # we need to extract 0th, 1st, and 2nd character from each batch
-
-        chararcter1 = emd[:,0,:]
-
-        chararcter2 = emd[:,1,:]
-
-        chararcter3 = emd[:,2,:]
-
-        c1_hidden = self.dense1(chararcter1) # green arrow in diagram for character 1 (WI)
-
-        c2_hidden = self.dense1(chararcter2) # green arrow in diagram for character 2 (WI)
-
-        c3_hidden = self.dense1(chararcter3) # green arrow in diagram for character 3 (WI)
-
-        c1_hidden_2 = self.dense2(c1_hidden)  # yellow arrow in diagram (WH)
-
-        addition_result = F.add(c2_hidden,c1_hidden_2) # Total c1 + c2
-
-        addition_hidden = self.dense2(addition_result) # yellow arrow in diagram (WH)
-
-        addition_result_2 = F.add(addition_hidden,c3_hidden) # Total c1 + c2 + c3
-
-        final_output = self.dense3(addition_result_2)   # The red arrow in diagram (WO)
-
+        # print( emd.shape )
+        # since the input is shape (batch_size, input(3 characters) )
+        # we need to extract 0th, 1st, 2nd character from each batch
+        character1 = emd[:, 0, :]
+        character2 = emd[:, 1, :]
+        character3 = emd[:, 2, :]
+        # green arrow in diagram for character 1
+        c1_hidden = self.dense1(character1)
+        # green arrow in diagram for character 2
+        c2_hidden = self.dense1(character2)
+        # green arrow in diagram for character 3
+        c3_hidden = self.dense1(character3)
+        # yellow arrow in diagram
+        c1_hidden_2 = self.dense2(c1_hidden)
+        addition_result = F.add(c2_hidden, c1_hidden_2)  # Total c1 + c2
+        addition_hidden = self.dense2(addition_result)  # the yellow arrow
+        addition_result_2 = F.add(addition_hidden, c3_hidden)  # Total c1 + c2
+        final_output = self.dense3(addition_result_2)
         return final_output
 
-  ```
+
+vocab_size = len(chars) + 1  # the vocabsize
+num_embed = 30
+num_hidden = 256
+# model creation
+simple_model = UnRolledRNN_Model(vocab_size, num_embed, num_hidden)
+# model initilisation
+simple_model.collect_params().initialize(mx.init.Xavier(), ctx=context)
+trainer = gluon.Trainer(simple_model.collect_params(), 'adam')
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
+
+```
 
 Basically, this neural network has embedding layers (emb) followed by 3 dense layers:
 
@@ -146,26 +106,25 @@ Basically, this neural network has embedding layers (emb) followed by 3 dense la
 
 You can check this [blog post](https://www.oreilly.com/ideas/sentiment-analysis-with-apache-mxnet) to learn about embedding layer) and its functionality.  The Dense layers 1, 2, and 3 learn a set of weights that can predict the 4th character given the first 3 characters.
 
-We use [Binary Cross Entropy Loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SigmoidBinaryCrossEntropyLoss) in our model. This model can be folded back and succinctly represented like Figure 5. <br />
+We use [Binary Cross Entropy Loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SigmoidBinaryCrossEntropyLoss) in our model. This model can be folded back and succinctly represented like Figure 4. <br />
 
-Figure 5. RNN simplified representation <br /> ![Alt text](images/RNN.png?raw=true "RNN")  <br />
+Figure 4. RNN simplified representation <br /> ![Alt text](images/RNN.png?raw=true "RNN")  <br />
 
-Figure 5 helps explain the math behind the model, which can be carried out as follows:
+Figure 4 helps explain the math behind the model, which can be carried out as follows:
 
 ```python
 
-hidden_state_at_t = (WI x input + WH x previous_hidden_state)
+hidden_state_at_t = tanh(WI x input + WH x previous_hidden_state + bias)
 
 ```
 
 Vanilla RNNs have some limitations. For example, let's say we have a long document containing the sentences "I was born in France during the world war" and "So I can speak French." A Vanilla RNN cannot understand the context of being "born in France" and "I can speak French" if they are far apart in a given document.
 
-In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 6). In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
-
-Figure 6. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true "Sequence to Sequence model with loss shown") <br />
-
-
 RNN doesn't provide the capability (at least in practice) to forget the irrelevant context in between the phrases. RNN gives more importance to the most previous hidden state because it cannot give preference to the arbitrary (t-k) hidden state, where t is the current time step and k is the number greater than 0. This is because training an RNN on a long sequence of words can cause the gradient to vanish (when the gradient is small) or to explode (when the gradient is large) during backpropagation. Basically, the [backpropagation algorithm](http://neuralnetworksanddeeplearning.com/chap2.html) multiplies the gradients along the computational graph of the neural network in reverse direction. Hence, when the eigenvalue of the Hidden state matrix is large or small, the gradient becomes unstable. A detailed explanation of the problems with RNN is explained [here](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.421.8930&rep=rep1&type=pdf).
+
+In addition to the many-to-one RNN, there are other types of RNN that process such memory-based applications, including the popular sequence-to-sequence RNN (Figure 5). In this sequence-to-sequence RNN, where sequence length is 3, each input is mapped onto a separate output. This helps the model to train faster because we measure loss (the difference between the predicted value and the actual output) at each time instant. Instead of one loss at the end, we can see loss1, loss2, etc., so that we get a better feedback (backpropagation) when training our model.
+
+Figure 5. Sequence-to-sequence RNN <br /> ![Alt text](images/loss.png?raw=true "Sequence to Sequence model with loss shown") <br />
 
 ### Long Short-Term Memory (LSTM)
 
@@ -184,12 +143,17 @@ If you are using a Conda environment, remember to install pip inside conda by ty
 Here's how to get set up:
 
 1. Install [Anaconda](https://www.continuum.io/downloads), a package manager. It is easier to install Python libraries using Anaconda.
+   You can use this command
+    curl -O https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+    chmod 777 Anaconda3-4.2.0-Linux-x86_64.sh 
+	./Anaconda3-4.2.0-Linux-x86_64.sh 
 
 2. Install [scikit-learn](http://scikit-learn.org/stable/install.html), a general-purpose scientific computing library. We'll use this to pre-process our data. You can install it with 'conda install scikit-learn'.
 
-3. Grab the Jupyter Notebook, with 'conda install jupyter notebook'.
+3. Grab the Jupyter Notebook, with 'conda install jupyter'.
 
-4. Get [MXNet](https://github.com/apache/incubator-mxnet/releases), an open source deep learning library. The Python notebook was tested on version 0.12.0 of MxNet, and you can install using pip as follows: pip install mxnet==0.12.0
+4. Get [MXNet](https://mxnet.incubator.apache.org), an open source deep learning library. The Python notebook was tested on version 0.12.0 of MxNet, and you can install using pip as follows: pip install mxnet-cu90 (if you have a GPU) else use pip install mxnet --pre. Please see the [documentation](http://scikit-learn.org/stable/install.html) for details 
+
 
 5. After you activate the anaconda environment, type these commands in it: ‘source activate mxnet'
 
@@ -197,15 +161,18 @@ The consolidated list of commands is:
 
 ```bash
 
+curl -O https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+chmod 777 Anaconda3-4.2.0-Linux-x86_64.sh 
+./Anaconda3-4.2.0-Linux-x86_64.sh 
 conda install pip
 
 pip install opencv-python
 
 conda install scikit-learn
 
-conda install jupyter notebook
+conda install jupyter
 
-pip install mxnet==0.12.0
+pip install mxnet-cu90
 
 ```
 
@@ -221,18 +188,17 @@ The dataset nietzsche.txt consists of 600901 characters, out of which 86 are uni
 
 ```python
 
+# total of characters in dataset
 chars = sorted(list(set(text)))
+vocab_size = len(chars)+1
+print('total chars:', vocab_size)
 
-#maps character to unique index e.g. {a:1,b:2....}
-
+# maps character to unique index e.g. {a:1,b:2....}
 char_indices = dict((c, i) for i, c in enumerate(chars))
-
-#maps indices to characters (1:a,2:b ....)
-
+# maps indices to character (1:a,2:b ....)
 indices_char = dict((i, c) for i, c in enumerate(chars))
 
-#convert the entire text into sequence
-
+# mapping the dataset into index
 idx = [char_indices[c] for c in text]
 
 ```
@@ -248,58 +214,42 @@ The code to do the conversion follows.
 
  ```python
 
- #Input for neural network(our basic rnn has 3 inputs, n samples)
-
-cs=3
-
+# input for neural network(our basic rnn has 3 inputs, n samples)
+cs = 3
 c1_dat = [idx[i] for i in range(0, len(idx)-1-cs, cs)]
-
 c2_dat = [idx[i+1] for i in range(0, len(idx)-1-cs, cs)]
-
 c3_dat = [idx[i+2] for i in range(0, len(idx)-1-cs, cs)]
-
-#The output of rnn network (single vector)
-
+# the output of rnn network (single vector)
 c4_dat = [idx[i+3] for i in range(0, len(idx)-1-cs, cs)]
 
-#Stacking the inputs to form3 input features
-
+# stacking the inputs to form (3 input features )
 x1 = np.stack(c1_dat[:-2])
-
 x2 = np.stack(c2_dat[:-2])
-
 x3 = np.stack(c3_dat[:-2])
 
-# Concatenate to form the input training set
+# the output (1 X N data points)
+y = np.stack(c4_dat[:-2])
 
-col_concat = np.array([x1,x2,x3])
-
+col_concat = np.array([x1, x2, x3])
 t_col_concat = col_concat.T
+print(t_col_concat.shape)
 
 ```
 
 We also batchify the training set in batches of 32, so that each training instance is of shape 32 X 3. Batchifying the input helps us train the model faster.
 
 ```python
-
-#Set the batch size as 32, so input is of form 32 X 3
-
-#output is 32 X 1
-
+# Set the batchsize as 32, so input is of form 32 X 3
+# output is 32 X 1
 batch_size = 32
 
-def get_batch(source,label_data, i,batch_size=32):
 
+def get_batch(source, label_data, i, batch_size=32):
     bb_size = min(batch_size, source.shape[0] - 1 - i)
-
-    data = source[i : i + bb_size]
-
+    data = source[i: i + bb_size]
     target = label_data[i: i + bb_size]
-
-    #print(target.shape)
-
-    return data, target.reshape((-1,))
-
+    # print(target.shape)
+    return data, target.reshape((-1, ))
 ```
 
 ### Preparing the dataset for gluon RNN
@@ -313,16 +263,17 @@ We have converted the input sequence to a batch size of 3 and a sequence length 
 
 ```python
 
+# prepares rnn batches
+# The batch will be of shape is (num_example * batch_size) because of RNN uses sequences of input     x
+# for example if we use (a1,a2,a3) as one input sequence , (b1,b2,b3) as another input sequence and (c1,c2,c3)
+# if we have batch of 3, then at timestep '1'  we only have (a1,b1.c1) as input, at timestep '2' we have (a2,b2,c2) as input...
+# hence the batchsize is of order 
+# In feedforward we use (batch_size, num_example)
 def rnn_batch(data, batch_size):
-
     """Reshape data into (num_example, batch_size)"""
-
     nbatch = data.shape[0] // batch_size
-
     data = data[:nbatch * batch_size]
-
     data = data.reshape((batch_size, nbatch)).T
-
     return data
 
 ```
@@ -333,14 +284,10 @@ Table 3. shows another example with batch size 2 and sequence length of 6. <br /
 
 #get the batch
 
-def get_batch(source, i,seq):
-
+def get_batch(source, i, seq):
     seq_len = min(seq, source.shape[0] - 1 - i)
-
-    data = source[i : i + seq_len]
-
-    target = source[i + 1 : i + 1 + seq_len]
-
+    data = source[i: i + seq_len]
+    target = source[i + 1: i + 1 + seq_len]
     return data, target.reshape((-1,))
 
 ```
@@ -354,67 +301,40 @@ Next, we define a class that allows us to create two RNN models that we have cho
 ```python
 
 # Class to create model objects.
-
 class GluonRNNModel(gluon.Block):
-
     """A model with an encoder, recurrent layer, and a decoder."""
 
     def __init__(self, mode, vocab_size, num_embed, num_hidden,
-
                  num_layers, dropout=0.5, **kwargs):
-
         super(GluonRNNModel, self).__init__(**kwargs)
-
         with self.name_scope():
-
             self.drop = nn.Dropout(dropout)
-
             self.encoder = nn.Embedding(vocab_size, num_embed,
-
-                                        weight_initializer = mx.init.Uniform(0.1))
+                                        weight_initializer=mx.init.Uniform(0.1))
 
             if mode == 'lstm':
-
                 self.rnn = rnn.LSTM(num_hidden, num_layers, dropout=dropout,
-
                                     input_size=num_embed)
-
             elif mode == 'gru':
-
                 self.rnn = rnn.GRU(num_hidden, num_layers, dropout=dropout,
-
                                    input_size=num_embed)
-
             else:
-
                 self.rnn = rnn.RNN(num_hidden, num_layers, activation='relu', dropout=dropout,
-
                                    input_size=num_embed)
-
-            self.decoder = nn.Dense(vocab_size, in_units = num_hidden)
-
+            self.decoder = nn.Dense(vocab_size, in_units=num_hidden)
             self.num_hidden = num_hidden
 
-
-
- #define the forward pass of the neural network
-
+    # define the forward pass of the neural network
     def forward(self, inputs, hidden):
-
         emb = self.drop(self.encoder(inputs))
-
         output, hidden = self.rnn(emb, hidden)
-
         output = self.drop(output)
-
+        # print('output forward',output.shape)
         decoded = self.decoder(output.reshape((-1, self.num_hidden)))
-
         return decoded, hidden
 
-    #Initial state of network
-
+    # Initial state of netork
     def begin_state(self, *args, **kwargs):
-
         return self.rnn.begin_state(*args, **kwargs)
 
 ```
@@ -430,40 +350,31 @@ We also have a "begin state" function that initializses the initial hidden state
 After defining the network, now, we have to train the neural network so that it learns.
 
 ```python
-
-def trainGluonRNN(epochs,train_data,seq=seq_length):
-
+def trainGluonRNN(epochs, train_data, seq=seq_length):
     for epoch in range(epochs):
-
         total_L = 0.0
-
-        hidden = model.begin_state(func = mx.nd.zeros, batch_size = batch_size, ctx = context)
-
+        hidden = model.begin_state(func=mx.nd.zeros, batch_size=batch_size, ctx=context)
         for ibatch, i in enumerate(range(0, train_data.shape[0] - 1, seq_length)):
-
-            data, target = get_batch(train_data, i,seq)
-
+            data, target = get_batch(train_data, i, seq)
             hidden = detach(hidden)
-
             with autograd.record():
-
                 output, hidden = model(data, hidden)
-
                 L = loss(output, target) # this is total loss associated with seq_length
-
                 L.backward()
 
             grads = [i.grad(context) for i in model.collect_params().values()]
-
             # Here gradient is for the whole batch.
-
             # So we multiply max_norm by batch_size and seq_length to balance it.
-
             gluon.utils.clip_global_norm(grads, clip * seq_length * batch_size)
 
             trainer.step(batch_size)
-
             total_L += mx.nd.sum(L).asscalar()
+
+            if ibatch % log_interval == 0 and ibatch > 0:
+                cur_L = total_L / seq_length / batch_size / log_interval
+                print('[Epoch %d Batch %d] loss %.2f', epoch + 1, ibatch, cur_L)
+                total_L = 0.0
+        model.save_params(rnn_save)
 
 ```
 
@@ -479,7 +390,7 @@ To generate text, we initialize the hidden state.
 
 ```python
 
- hidden = model.begin_state(func = mx.nd.zeros, batch_size = batch_size, ctx=context)
+ hidden = model.begin_state(func=mx.nd.zeros, batch_size=batch_size, ctx=context)
 
 ```
 
@@ -489,9 +400,7 @@ Then, we reshape the input sequence vector to a shape that the RNN model accepts
 
 ```python
 
- sample_input = mx.nd.array(np.array([idx[0:seq_length]]).T
-
-                                ,ctx=context)
+ sample_input = mx.nd.array(np.array([idx[0:seq_length]]).T, ctx=context)
 
 ```
 
@@ -499,86 +408,47 @@ Then we look at the argmax of the output produced by the network. generate outpu
 
 ```python
 
-output,hidden = model(sample_input,hidden)
-
-output,hidden = model(sample_input,hidden)
-
-index = mx.nd.argmax(output, axis=1)
-
-index = index.asnumpy()
-
-count = count + 1
-
-```
-
-Then append output char 'c' to the input string
-
-```python
-
-sample_input = mx.nd.array(np.array([idx[0:seq_length]]).T,ctx=context)
-
-new_string = new_string + indices_char[index[-1]]
-
-input_string = input_string[1:] + indices_char[index[-1]]
-
-```
-
-Next, slice the first character of the input string.
-
-```python
-
- new_string = new_string + indices_char[index[-1]]
-
-        input_string = input_string[1:] + indices_char[index[-1]]
-
-```
-
-The following code generates “nietzsche” like text of arbitrary length.
-
-```python
-
-# a nietzsche like text generator
-
-import sys
-
-def generate_random_text(model,input_string,seq_length,batch_size,sentence_length_to_generate):
-
-    count = 0
-
-    new_string = ''
-
-    cp_input_string = input_string
-
-    hidden = model.begin_state(func = mx.nd.zeros, batch_size = batch_size, ctx=context)
-
-    while count < sentence_length_to_generate:
-
-        idx = [char_indices[c] for c in input_string]
-
-        if(len(input_string) != seq_length):
-
-            print(len(input_string))
-
-            raise ValueError('there was a error in the input ')
-
-        sample_input = mx.nd.array(np.array([idx[0:seq_length]]).T
-
-                                ,ctx=context)
-
-        output,hidden = model(sample_input,hidden)
-
+output, hidden = model(sample_input, hidden)
         index = mx.nd.argmax(output, axis=1)
-
         index = index.asnumpy()
-
         count = count + 1
 
+```
+
+Then append output char 'c' to the input string. Next, slice the first character of the input string.
+
+```python
+
+new_string = new_string + indices_char[index[-1]]
+input_string = input_string[1:] + indices_char[index[-1]]
+```
+
+
+Below is the full function that generates “nietzsche” like text of arbitrary length.
+
+```python
+import sys
+
+
+# a nietzsche like text generator
+def generate_random_text(model, input_string, seq_length, batch_size, sentence_length):
+    count = 0
+    new_string = ''
+    cp_input_string = input_string
+    hidden = model.begin_state(func=mx.nd.zeros, batch_size=batch_size, ctx=context)
+    while count < sentence_length:
+        idx = [char_indices[c] for c in input_string]
+        if(len(input_string) != seq_length):
+            print(len(input_string))
+            raise ValueError('there was a error in the input ')
+        sample_input = mx.nd.array(np.array([idx[0:seq_length]]).T, ctx=context)
+        output, hidden = model(sample_input, hidden)
+        index = mx.nd.argmax(output, axis=1)
+        index = index.asnumpy()
+        count = count + 1
         new_string = new_string + indices_char[index[-1]]
-
         input_string = input_string[1:] + indices_char[index[-1]]
-
     print(cp_input_string + new_string)
-
 ```
 
 If you look at the text generated, we will notice that the model has learned open and close quotations(""). It has a definite structure and looks similar to 'nietzsche'.
@@ -588,5 +458,3 @@ You can also train a model on your chat history to predict the next character yo
 In our next article, we will take a look at generative models*, especially Generative Adversarial Networks, a powerful model that can generate new data from a given input dataset.
 
 *Note - Although RNN model is used to generate text, it is not actually a 'Generative Model' in the strict sense. This [pdf document](https://arxiv.org/pdf/1703.01898.pdf) clearly illustrates the difference between a  generative model and discriminative model for text classification.
-
-
